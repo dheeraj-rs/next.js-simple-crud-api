@@ -1,4 +1,3 @@
-// app/api/items/[id]/route.js
 import connectDB from '@/lib/db';
 import Item from '@/models/Item';
 

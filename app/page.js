@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Modal from '@/components/Modal';
 
 export default function Home() {
+  const apiurl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL;
   const [items, setItems] = useState([]);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -14,22 +15,21 @@ export default function Home() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await fetch('/.netlify/functions/items');
+        const res = await fetch(`${apiurl}/api/items`);
         const data = await res.json();
-        console.log(data); // Log the data
-        setItems(Array.isArray(data) ? data : []); // Ensure data is an array
+        setItems(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('Failed to fetch items:', error);
       }
     }
     fetchData();
-  }, []);
+  }, [apiurl]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if (editMode) {
-        const res = await fetch(`/.netlify/functions/items?id=${currentId}`, {
+        const res = await fetch(`${apiurl}/api/items/${currentId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -43,7 +43,7 @@ export default function Home() {
         setEditMode(false);
         setCurrentId(null);
       } else {
-        const res = await fetch('/.netlify/functions/items', {
+        const res = await fetch(`${apiurl}/api/items`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ export default function Home() {
 
   const handleDelete = async (id) => {
     try {
-      await fetch(`/.netlify/functions/items?id=${id}`, {
+      await fetch(`${apiurl}/api/items/${id}`, {
         method: 'DELETE',
       });
       setItems(items.filter((item) => item._id !== id));
@@ -92,71 +92,73 @@ export default function Home() {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Items</h1>
-      <button
-        onClick={openModal}
-        className="bg-green-500 text-white px-4 py-2 rounded mb-4"
-      >
-        Add Item
-      </button>
-      <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {items.map((item) => (
-          <li
-            key={item._id}
-            className="bg-white p-4 rounded-lg shadow-md flex flex-col"
-          >
-            <div className="flex-1">
-              <h2 className="text-xl font-semibold">{item.name}</h2>
-              <p className="text-gray-700">{item.description}</p>
+    <main className="w-screen h-screen p-4 bg-[rgba(220,242,247,0.33)]">
+      <div className="container mx-auto">
+        <h1 className="text-2xl font-bold mb-4">CRUD APP</h1>
+        <button
+          onClick={openModal}
+          className="bg-green-500 text-white px-4 py-2 rounded mb-4"
+        >
+          Add Item
+        </button>
+        <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {items.map((item) => (
+            <li
+              key={item._id}
+              className="bg-white p-4 rounded-lg shadow-md flex flex-col"
+            >
+              <div className="flex-1">
+                <h2 className="text-xl font-semibold">{item.name}</h2>
+                <p className="text-gray-700">{item.description}</p>
+              </div>
+              <div className="mt-4 flex justify-end space-x-2">
+                <button
+                  onClick={() => handleEdit(item)}
+                  className="bg-blue-500 text-white px-2 py-1 rounded"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(item._id)}
+                  className="bg-red-500 text-white px-2 py-1 rounded"
+                >
+                  Delete
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+        <Modal show={showModal} onClose={closeModal}>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <input
+                type="text"
+                placeholder="Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="w-full p-2 border border-gray-300 rounded"
+              />
             </div>
-            <div className="mt-4 flex justify-end space-x-2">
-              <button
-                onClick={() => handleEdit(item)}
-                className="bg-blue-500 text-white px-2 py-1 rounded"
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => handleDelete(item._id)}
-                className="bg-red-500 text-white px-2 py-1 rounded"
-              >
-                Delete
-              </button>
+            <div>
+              <input
+                type="text"
+                placeholder="Description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                required
+                className="w-full p-2 border border-gray-300 rounded"
+              />
             </div>
-          </li>
-        ))}
-      </ul>
-      <Modal show={showModal} onClose={closeModal}>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <input
-              type="text"
-              placeholder="Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="w-full p-2 border border-gray-300 rounded"
-            />
-          </div>
-          <div>
-            <input
-              type="text"
-              placeholder="Description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              required
-              className="w-full p-2 border border-gray-300 rounded"
-            />
-          </div>
-          <button
-            type="submit"
-            className="bg-green-500 text-white px-4 py-2 rounded"
-          >
-            {editMode ? 'Update Item' : 'Add Item'}
-          </button>
-        </form>
-      </Modal>
-    </div>
+            <button
+              type="submit"
+              className="bg-green-500 text-white px-4 py-2 rounded"
+            >
+              {editMode ? 'Update Item' : 'Add Item'}
+            </button>
+          </form>
+        </Modal>
+      </div>
+    </main>
   );
 }
