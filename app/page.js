@@ -13,43 +13,52 @@ export default function Home() {
 
   useEffect(() => {
     async function fetchData() {
-      const res = await fetch('/.netlify/functions/items');
-      const data = await res.json();
-      setItems(data);
+      try {
+        const res = await fetch('/.netlify/functions/items');
+        const data = await res.json();
+        console.log(data); // Log the data
+        setItems(Array.isArray(data) ? data : []); // Ensure data is an array
+      } catch (error) {
+        console.error('Failed to fetch items:', error);
+      }
     }
     fetchData();
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editMode) {
-      const res = await fetch(`/.netlify/functions/items?id=${currentId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, description }),
-      });
-      const updatedItem = await res.json();
-      setItems(
-        items.map((item) => (item._id === currentId ? updatedItem : item))
-      );
-      setEditMode(false);
-      setCurrentId(null);
-    } else {
-      const res = await fetch('/.netlify/functions/items', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, description }),
-      });
-      const newItem = await res.json();
-      setItems([...items, newItem]);
+    try {
+      if (editMode) {
+        const res = await fetch(`/.netlify/functions/items?id=${currentId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ name, description }),
+        });
+        const updatedItem = await res.json();
+        setItems(
+          items.map((item) => (item._id === currentId ? updatedItem : item))
+        );
+        setEditMode(false);
+        setCurrentId(null);
+      } else {
+        const res = await fetch('/.netlify/functions/items', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ name, description }),
+        });
+        const newItem = await res.json();
+        setItems([...items, newItem]);
+      }
+      setName('');
+      setDescription('');
+      setShowModal(false);
+    } catch (error) {
+      console.error('Failed to submit item:', error);
     }
-    setName('');
-    setDescription('');
-    setShowModal(false);
   };
 
   const handleEdit = (item) => {
@@ -61,10 +70,14 @@ export default function Home() {
   };
 
   const handleDelete = async (id) => {
-    await fetch(`/.netlify/functions/items?id=${id}`, {
-      method: 'DELETE',
-    });
-    setItems(items.filter((item) => item._id !== id));
+    try {
+      await fetch(`/.netlify/functions/items?id=${id}`, {
+        method: 'DELETE',
+      });
+      setItems(items.filter((item) => item._id !== id));
+    } catch (error) {
+      console.error('Failed to delete item:', error);
+    }
   };
 
   const openModal = () => {
