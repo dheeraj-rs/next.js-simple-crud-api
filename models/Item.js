@@ -1,14 +1,19 @@
-import mongoose from 'mongoose';
+import { Schema, model, models } from 'mongoose';
 
-const ItemSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
+const ItemSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
   },
-  description: {
-    type: String,
-    required: true,
-  },
-});
+  { timestamps: true }
+);
 
-export default mongoose.models.Item || mongoose.model('Item', ItemSchema);
+const PostModel = models.post || model('Item', ItemSchema);
+
+export default PostModel;

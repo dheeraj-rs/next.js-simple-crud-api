@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react';
 import Modal from '@/components/Modal';
 
 export default function Home() {
-  const apiurl = process.env.API_URL;
-
   const [items, setItems] = useState([]);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -13,10 +11,12 @@ export default function Home() {
   const [currentId, setCurrentId] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
+  const url = process.env.PUBLIC_API_URL;
+
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await fetch(`${apiurl}/api/items`);
+        const res = await fetch(`${url}/api/items`);
         const data = await res.json();
         setItems(Array.isArray(data) ? data : []);
       } catch (error) {
@@ -24,13 +24,13 @@ export default function Home() {
       }
     }
     fetchData();
-  }, [apiurl]);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if (editMode) {
-        const res = await fetch(`${apiurl}/api/items/${currentId}`, {
+        const res = await fetch(`${url}/api/items/${currentId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -44,7 +44,7 @@ export default function Home() {
         setEditMode(false);
         setCurrentId(null);
       } else {
-        const res = await fetch(`${apiurl}/api/items`, {
+        const res = await fetch(`${url}/api/items`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -72,7 +72,7 @@ export default function Home() {
 
   const handleDelete = async (id) => {
     try {
-      await fetch(`${apiurl}/api/items/${id}`, {
+      await fetch(`${url}/api/items/${id}`, {
         method: 'DELETE',
       });
       setItems(items.filter((item) => item._id !== id));

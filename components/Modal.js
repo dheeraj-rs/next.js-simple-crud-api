@@ -1,15 +1,21 @@
-export default function Modal({ show, onClose, children }) {
+import React from 'react';
+
+const Modal = ({ show, onClose, children }) => {
   if (!show) return null;
+
   return (
-    <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex justify-center items-center z-50">
-      <div className="bg-white rounded-lg p-4 w-3/4 md:w-1/2 lg:w-1/3 relative">
-        <div className="flex justify-end">
-          <button onClick={onClose} className="text-gray-700 text-2xl">
-            &times;
-          </button>
-        </div>
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded shadow-lg">
+        <button
+          onClick={onClose}
+          className="absolute top-2 right-2 text-gray-600"
+        >
+          &times;
+        </button>
         {children}
       </div>
     </div>
   );
-}
+};
+
+export default Modal;
