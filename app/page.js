@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import Modal from '@/components/Modal';
 
 export default function Home() {
-  const apiurl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL;
+  const apiurl = process.env.API_URL;
+
   const [items, setItems] = useState([]);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
