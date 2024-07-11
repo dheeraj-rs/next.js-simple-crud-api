@@ -1,7 +1,7 @@
 import connectDB from '@/lib/db';
 import Item from '@/models/Item';
 
-export async function GET(request) {
+export async function GET() {
   await connectDB();
   const items = await Item.find({});
   return new Response(JSON.stringify(items), {

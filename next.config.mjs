@@ -1,14 +1,10 @@
-import { PHASE_DEVELOPMENT_SERVER } from 'next/constants.js';
-
-const config = (phase) => {
-  const isDev = phase === PHASE_DEVELOPMENT_SERVER;
-
+const config = () => {
   return {
-    reactStrictMode: true,
+    // reactStrictMode: true,
     env: {
       API_URL: process.env.API_URL,
+      MONGODB_URI: process.env.MONGODB_URI,
     },
-    // other configurations
   };
 };
 
